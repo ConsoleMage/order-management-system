@@ -10,5 +10,4 @@ public class Order
         Console.WriteLine($"Order ID: {Id} for {CustomerName} | Items: {Items.Count} | Date: {DatePlaced}");
     }
 
-    
 }
