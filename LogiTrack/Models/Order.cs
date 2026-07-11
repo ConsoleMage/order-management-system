@@ -1,9 +1,9 @@
 public class Order
 {
     public int Id { get; set; }
-    public string CustomerName { get; set; }
+    public string CustomerName { get; set; } = string.Empty;
     public DateTime DatePlaced { get; set; }
-    public List<InventoryItem> Items { get; set; }
+    public List<InventoryItem> Items { get; set; } = new();
 
     public void GetOrderSummary()
     {
