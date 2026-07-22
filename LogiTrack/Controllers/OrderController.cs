@@ -36,16 +36,6 @@ public class OrderController : ControllerBase
 
     // POST: api/orders
     [HttpPost]
-    public async Task<ActionResult<Order>> PostOrder(Order order)
-    {
-        _context.Orders.Add(order);
-        await _context.SaveChangesAsync();
-
-        return CreatedAtAction(nameof(GetOrder), new { id = order.Id }, order);
-    }
-
-    // POST: api/orders
-    [HttpPost]
     public async Task<ActionResult<IEnumerable<Order>>> PostOrders(List<Order> orders)
     {
         if (orders == null || !orders.Any())
