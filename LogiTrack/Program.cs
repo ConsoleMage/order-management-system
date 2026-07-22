@@ -1,4 +1,6 @@
 using Microsoft.EntityFrameworkCore;
+using Microsoft.AspNetCore.Identity;
+using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -12,6 +14,10 @@ var connectionString = builder.Configuration.GetConnectionString("DefaultConnect
 // Register your DbContext
 builder.Services.AddDbContext<LogiTrackContext>(options =>
     options.UseSqlite(connectionString));
+
+// Option B (use this if ApplicationUser is not defined — uses built-in IdentityUser):
+builder.Services.AddIdentity<IdentityUser, IdentityRole>()
+    .AddEntityFrameworkStores<LogiTrackContext>();    
 
 var app = builder.Build();
 
@@ -29,6 +35,9 @@ if (app.Environment.IsDevelopment())
 }
 
 app.UseHttpsRedirection();
+
+// Add authentication middleware before authorization
+app.UseAuthentication();
 app.UseAuthorization();
 app.MapControllers();
 
