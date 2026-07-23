@@ -1,5 +1,12 @@
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.Configuration;
+using Microsoft.IdentityModel.Tokens;
+using System;
+using System.Collections.Generic;
+using System.IdentityModel.Tokens.Jwt;
+using System.Security.Claims;
+using System.Text;
 using System.Threading.Tasks;
 
 [ApiController]
@@ -8,11 +15,16 @@ public class AuthController : ControllerBase
 {
     private readonly UserManager<IdentityUser> _userManager;
     private readonly SignInManager<IdentityUser> _signInManager;
+    private readonly IConfiguration _configuration;
 
-    public AuthController(UserManager<IdentityUser> userManager, SignInManager<IdentityUser> signInManager)
+    public AuthController(
+        UserManager<IdentityUser> userManager,
+        SignInManager<IdentityUser> signInManager,
+        IConfiguration configuration)
     {
         _userManager = userManager;
         _signInManager = signInManager;
+        _configuration = configuration;
     }
 
     // POST: api/auth/register
@@ -50,14 +62,57 @@ public class AuthController : ControllerBase
         if (!ModelState.IsValid)
             return BadRequest(ModelState);
 
-        var signInResult = await _signInManager.PasswordSignInAsync(model.Email, model.Password, isPersistent: false, lockoutOnFailure: false);
+        var signInResult = await _signInManager.PasswordSignInAsync(
+            model.Email,
+            model.Password,
+            isPersistent: false,
+            lockoutOnFailure: false);
 
         if (!signInResult.Succeeded)
         {
             return Unauthorized(new { message = "Invalid credentials" });
         }
 
-        return Ok(new { message = "Login successful" });
+        var user = await _userManager.FindByEmailAsync(model.Email);
+        if (user == null)
+        {
+            return Unauthorized(new { message = "Invalid credentials" });
+        }
+
+        var token = GenerateJwtToken(user);
+        return Ok(new { message = "Login successful", token });
+    }
+
+    private string GenerateJwtToken(IdentityUser user)
+    {
+        var key = _configuration["Jwt:Key"];
+        if (string.IsNullOrWhiteSpace(key))
+        {
+            throw new InvalidOperationException("JWT key is not configured.");
+        }
+
+        var issuer = _configuration["Jwt:Issuer"] ?? "LogiTrack";
+        var audience = _configuration["Jwt:Audience"] ?? "LogiTrackUsers";
+        var expiryMinutes = int.TryParse(_configuration["Jwt:ExpiryMinutes"], out var expiry) ? expiry : 60;
+
+        var claims = new List<Claim>
+        {
+            new Claim(JwtRegisteredClaimNames.Sub, user.Id),
+            new Claim(JwtRegisteredClaimNames.Email, user.Email),
+            new Claim(ClaimTypes.NameIdentifier, user.Id)
+        };
+
+        var securityKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(key));
+        var credentials = new SigningCredentials(securityKey, SecurityAlgorithms.HmacSha256);
+
+        var token = new JwtSecurityToken(
+            issuer: issuer,
+            audience: audience,
+            claims: claims,
+            expires: DateTime.UtcNow.AddMinutes(expiryMinutes),
+            signingCredentials: credentials);
+
+        return new JwtSecurityTokenHandler().WriteToken(token);
     }
 }
 
