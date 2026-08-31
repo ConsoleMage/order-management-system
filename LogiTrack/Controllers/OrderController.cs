@@ -53,6 +53,7 @@ public class OrderController : ControllerBase
 
     // DELETE: api/orders/{id}
     [HttpDelete("{id}")]
+    [Authorize(Roles = "Manager")]
     public async Task<IActionResult> DeleteOrder(int id)
     {
         var order = await _context.Orders.FindAsync(id);

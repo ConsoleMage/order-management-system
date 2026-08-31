@@ -33,6 +33,7 @@ public class InventoryController : ControllerBase
 
     // DELETE: api/inventory/{id}
     [HttpDelete("{id}")]
+    [Authorize(Roles = "Manager")]
     public async Task<IActionResult> DeleteInventoryItem(int id)
     {
         var item = await _context.InventoryItems.FindAsync(id);

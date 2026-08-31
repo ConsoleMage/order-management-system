@@ -153,3 +153,9 @@ C:\Users\Admin\Documents\GitHub\order-management-system\LogiTrack\obj\Debug\net9
 C:\Users\Admin\Documents\GitHub\order-management-system\LogiTrack\obj\Debug\net9.0\LogiTrack.genruntimeconfig.cache
 C:\Users\Admin\Documents\GitHub\order-management-system\LogiTrack\obj\Debug\net9.0\ref\LogiTrack.dll
 C:\Users\Admin\Documents\GitHub\order-management-system\LogiTrack\bin\Debug\net9.0\Microsoft.AspNetCore.Identity.EntityFrameworkCore.dll
+C:\Users\Admin\Documents\GitHub\order-management-system\LogiTrack\bin\Debug\net9.0\Microsoft.Bcl.Cryptography.dll
+C:\Users\Admin\Documents\GitHub\order-management-system\LogiTrack\bin\Debug\net9.0\Microsoft.IdentityModel.Abstractions.dll
+C:\Users\Admin\Documents\GitHub\order-management-system\LogiTrack\bin\Debug\net9.0\Microsoft.IdentityModel.JsonWebTokens.dll
+C:\Users\Admin\Documents\GitHub\order-management-system\LogiTrack\bin\Debug\net9.0\Microsoft.IdentityModel.Logging.dll
+C:\Users\Admin\Documents\GitHub\order-management-system\LogiTrack\bin\Debug\net9.0\Microsoft.IdentityModel.Tokens.dll
+C:\Users\Admin\Documents\GitHub\order-management-system\LogiTrack\bin\Debug\net9.0\System.IdentityModel.Tokens.Jwt.dll
