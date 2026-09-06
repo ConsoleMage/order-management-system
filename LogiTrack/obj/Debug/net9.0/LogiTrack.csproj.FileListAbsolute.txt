@@ -1,7 +1,6 @@
 C:\Users\Admin\Documents\GitHub\order-management-system\LogiTrack\bin\Debug\net9.0\appsettings.Development.json
 C:\Users\Admin\Documents\GitHub\order-management-system\LogiTrack\bin\Debug\net9.0\appsettings.json
 C:\Users\Admin\Documents\GitHub\order-management-system\LogiTrack\bin\Debug\net9.0\LogiTrack.staticwebassets.endpoints.json
-C:\Users\Admin\Documents\GitHub\order-management-system\LogiTrack\bin\Debug\net9.0\LogiTrack.exe
 C:\Users\Admin\Documents\GitHub\order-management-system\LogiTrack\bin\Debug\net9.0\LogiTrack.deps.json
 C:\Users\Admin\Documents\GitHub\order-management-system\LogiTrack\bin\Debug\net9.0\LogiTrack.runtimeconfig.json
 C:\Users\Admin\Documents\GitHub\order-management-system\LogiTrack\bin\Debug\net9.0\LogiTrack.dll
@@ -159,3 +158,4 @@ C:\Users\Admin\Documents\GitHub\order-management-system\LogiTrack\bin\Debug\net9
 C:\Users\Admin\Documents\GitHub\order-management-system\LogiTrack\bin\Debug\net9.0\Microsoft.IdentityModel.Logging.dll
 C:\Users\Admin\Documents\GitHub\order-management-system\LogiTrack\bin\Debug\net9.0\Microsoft.IdentityModel.Tokens.dll
 C:\Users\Admin\Documents\GitHub\order-management-system\LogiTrack\bin\Debug\net9.0\System.IdentityModel.Tokens.Jwt.dll
+C:\Users\Admin\Documents\GitHub\order-management-system\LogiTrack\bin\Debug\net9.0\LogiTrack.exe
