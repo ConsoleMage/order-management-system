@@ -5,7 +5,7 @@ using Microsoft.AspNetCore.Authorization;
 namespace LogiTrack.Controllers;
 
 [ApiController]
-[Route("api/[controller]")]
+[Route("api/orders")]
 [Authorize]
 public class OrderController : ControllerBase
 {
