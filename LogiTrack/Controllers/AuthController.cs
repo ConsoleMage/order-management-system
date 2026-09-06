@@ -13,17 +13,23 @@ namespace LogiTrack.Controllers;
 public class AuthController : ControllerBase
 {
     private readonly UserManager<IdentityUser> _userManager;
+    private readonly RoleManager<IdentityRole> _roleManager;
     private readonly SignInManager<IdentityUser> _signInManager;
     private readonly IConfiguration _configuration;
+    private readonly IWebHostEnvironment _environment;
 
     public AuthController(
         UserManager<IdentityUser> userManager,
+        RoleManager<IdentityRole> roleManager,
         SignInManager<IdentityUser> signInManager,
-        IConfiguration configuration)
+        IConfiguration configuration,
+        IWebHostEnvironment environment)
     {
         _userManager = userManager;
+        _roleManager = roleManager;
         _signInManager = signInManager;
         _configuration = configuration;
+        _environment = environment;
     }
 
     // POST: api/auth/register
@@ -54,6 +60,41 @@ public class AuthController : ControllerBase
         return Ok(new { message = "User registered successfully" });
     }
 
+    // POST: api/auth/register-manager-test
+    [HttpPost("register-manager-test")]
+    public async Task<IActionResult> RegisterManagerTest([FromBody] RegisterDto model)
+    {
+        if (!_environment.IsDevelopment())
+            return NotFound();
+
+        if (!ModelState.IsValid)
+            return BadRequest(ModelState);
+
+        var user = new IdentityUser
+        {
+            UserName = model.Email,
+            Email = model.Email
+        };
+
+        var result = await _userManager.CreateAsync(user, model.Password);
+        if (!result.Succeeded)
+        {
+            foreach (var error in result.Errors)
+            {
+                ModelState.AddModelError(error.Code, error.Description);
+            }
+            return BadRequest(ModelState);
+        }
+
+        if (!await _roleManager.RoleExistsAsync("Manager"))
+        {
+            await _roleManager.CreateAsync(new IdentityRole("Manager"));
+        }
+
+        await _userManager.AddToRoleAsync(user, "Manager");
+        return Ok(new { message = "Development manager user registered successfully" });
+    }
+
     // POST: api/auth/login
     [HttpPost("login")]
     public async Task<IActionResult> Login([FromBody] LoginDto model)
@@ -78,11 +119,11 @@ public class AuthController : ControllerBase
             return Unauthorized(new { message = "Invalid credentials" });
         }
 
-        var token = GenerateJwtToken(user);
+        var token = await GenerateJwtToken(user);
         return Ok(new { message = "Login successful", token });
     }
 
-    private string GenerateJwtToken(IdentityUser user)
+    private async Task<string> GenerateJwtToken(IdentityUser user)
     {
         var key = _configuration["Jwt:Key"];
         if (string.IsNullOrWhiteSpace(key))
@@ -97,9 +138,12 @@ public class AuthController : ControllerBase
         var claims = new List<Claim>
         {
             new Claim(JwtRegisteredClaimNames.Sub, user.Id),
-            new Claim(JwtRegisteredClaimNames.Email, user.Email),
+            new Claim(JwtRegisteredClaimNames.Email, user.Email ?? string.Empty),
             new Claim(ClaimTypes.NameIdentifier, user.Id)
         };
+
+        var roles = await _userManager.GetRolesAsync(user);
+        claims.AddRange(roles.Select(role => new Claim(ClaimTypes.Role, role)));
 
         var securityKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(key));
         var credentials = new SigningCredentials(securityKey, SecurityAlgorithms.HmacSha256);
@@ -119,16 +163,16 @@ public class AuthController : ControllerBase
 public class RegisterDto
 {
     [Required]
-    public string Email { get; set; }
+    public string Email { get; set; } = string.Empty;
     [Required]
-    public string Password { get; set; }
+    public string Password { get; set; } = string.Empty;
 }
 
 // DTO for login
 public class LoginDto
 {
     [Required]
-    public string Email { get; set; }
+    public string Email { get; set; } = string.Empty;
     [Required]
-    public string Password { get; set; }
+    public string Password { get; set; } = string.Empty;
 }

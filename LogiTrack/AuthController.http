@@ -12,6 +12,16 @@ Content-Type: application/json
   "password": "{{testPassword}}"
 }
 
+### Register a Manager test user (Development only)
+@managerEmail = manager-test@example.com
+POST {{baseUrl}}/api/auth/register-manager-test
+Content-Type: application/json
+
+{
+  "email": "{{managerEmail}}",
+  "password": "{{testPassword}}"
+}
+
 ### Login and capture the JWT
 # @name login
 POST {{baseUrl}}/api/auth/login

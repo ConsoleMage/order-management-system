@@ -1,0 +1,44 @@
+@baseUrl = https://localhost:7077
+@managerEmail = inventory-manager-test@example.com
+@testPassword = Password123!
+@itemId = 1
+
+### Register a Manager test user (Development only)
+# Run once. A 400 response means this test user already exists.
+POST {{baseUrl}}/api/auth/register-manager-test
+Content-Type: application/json
+
+{
+  "email": "{{managerEmail}}",
+  "password": "{{testPassword}}"
+}
+
+### Login as Manager and capture the JWT
+# @name login
+POST {{baseUrl}}/api/auth/login
+Content-Type: application/json
+
+{
+  "email": "{{managerEmail}}",
+  "password": "{{testPassword}}"
+}
+
+### Get all inventory items
+GET {{baseUrl}}/api/inventory
+Authorization: Bearer {{login.response.body.$.token}}
+
+### Create an inventory item
+POST {{baseUrl}}/api/inventory
+Authorization: Bearer {{login.response.body.$.token}}
+Content-Type: application/json
+
+{
+  "name": "Test scanner",
+  "quantity": 10,
+  "location": "Warehouse A"
+}
+
+### Delete an inventory item as Manager
+# Set @itemId to an existing item ID before running this request.
+DELETE {{baseUrl}}/api/inventory/{{itemId}}
+Authorization: Bearer {{login.response.body.$.token}}

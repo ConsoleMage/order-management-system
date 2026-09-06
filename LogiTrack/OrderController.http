@@ -1,0 +1,46 @@
+@baseUrl = https://localhost:7077
+@managerEmail = order-manager-test@example.com
+@testPassword = Password123!
+@orderId = 1
+
+### Register a Manager test user (Development only)
+# Run once. A 400 response means this test user already exists.
+POST {{baseUrl}}/api/auth/register-manager-test
+Content-Type: application/json
+
+{
+  "email": "{{managerEmail}}",
+  "password": "{{testPassword}}"
+}
+
+### Login as Manager and capture the JWT
+# @name login
+POST {{baseUrl}}/api/auth/login
+Content-Type: application/json
+
+{
+  "email": "{{managerEmail}}",
+  "password": "{{testPassword}}"
+}
+
+### Get all orders
+GET {{baseUrl}}/api/orders
+Authorization: Bearer {{login.response.body.$.token}}
+
+### Create an order
+POST {{baseUrl}}/api/orders
+Authorization: Bearer {{login.response.body.$.token}}
+Content-Type: application/json
+
+[
+  {
+    "customerName": "Test customer",
+    "datePlaced": "2026-09-06T12:00:00Z",
+    "items": []
+  }
+]
+
+### Delete an order as Manager
+# Set @orderId to an existing order ID before running this request.
+DELETE {{baseUrl}}/api/orders/{{orderId}}
+Authorization: Bearer {{login.response.body.$.token}}
