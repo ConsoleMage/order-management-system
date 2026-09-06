@@ -1,13 +1,12 @@
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.Extensions.Configuration;
 using Microsoft.IdentityModel.Tokens;
-using System;
-using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations;
 using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 using System.Text;
-using System.Threading.Tasks;
+
+namespace LogiTrack.Controllers;
 
 [ApiController]
 [Route("api/[controller]")]
@@ -119,13 +118,17 @@ public class AuthController : ControllerBase
 // DTO for registration
 public class RegisterDto
 {
+    [Required]
     public string Email { get; set; }
+    [Required]
     public string Password { get; set; }
 }
 
 // DTO for login
 public class LoginDto
 {
+    [Required]
     public string Email { get; set; }
+    [Required]
     public string Password { get; set; }
 }

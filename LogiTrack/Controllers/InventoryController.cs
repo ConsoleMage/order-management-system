@@ -2,6 +2,8 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.AspNetCore.Authorization;
 
+namespace LogiTrack.Controllers;
+
 [ApiController]
 [Route("api/[controller]")]
 [Authorize]

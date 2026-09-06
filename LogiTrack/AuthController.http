@@ -1,0 +1,44 @@
+@baseUrl = https://localhost:7077
+@testEmail = auth-test@example.com
+@testPassword = Password123!
+
+### Register a test user
+# Change @testEmail before rerunning this request after the user already exists.
+POST {{baseUrl}}/api/auth/register
+Content-Type: application/json
+
+{
+  "email": "{{testEmail}}",
+  "password": "{{testPassword}}"
+}
+
+### Login and capture the JWT
+# @name login
+POST {{baseUrl}}/api/auth/login
+Content-Type: application/json
+
+{
+  "email": "{{testEmail}}",
+  "password": "{{testPassword}}"
+}
+
+### Login with invalid credentials
+POST {{baseUrl}}/api/auth/login
+Content-Type: application/json
+
+{
+  "email": "{{testEmail}}",
+  "password": "WrongPassword123!"
+}
+
+### Register with missing required fields
+POST {{baseUrl}}/api/auth/register
+Content-Type: application/json
+
+{}
+
+### Login with missing required fields
+POST {{baseUrl}}/api/auth/login
+Content-Type: application/json
+
+{}
