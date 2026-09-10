@@ -20,14 +20,22 @@ public class OrderController : ControllerBase
     [HttpGet]
     public async Task<ActionResult<IEnumerable<Order>>> GetOrders()
     {
-        return await _context.Orders.ToListAsync();
+        var orders = await _context.Orders
+            .AsNoTracking()
+            .Include(o => o.Items)
+            .ToListAsync();
+
+        return orders;
     }
 
     // GET: api/orders/{id}
     [HttpGet("{id}")]
     public async Task<ActionResult<Order>> GetOrder(int id)
     {
-        var order = await _context.Orders.FindAsync(id);
+        var order = await _context.Orders
+            .AsNoTracking()
+            .Include(o => o.Items)
+            .FirstOrDefaultAsync(o => o.Id == id);
 
         if (order == null)
         {

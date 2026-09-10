@@ -23,7 +23,18 @@ public class InventoryController : ControllerBase
     [HttpGet]
     public async Task<ActionResult<IEnumerable<InventoryItem>>> GetInventoryItems()
     {
-        return await _context.InventoryItems.ToListAsync();
+        const string cacheKey = "inventory-items";
+
+        if (_cache.TryGetValue(cacheKey, out List<InventoryItem>? cachedItems))
+        {
+            return cachedItems ?? new List<InventoryItem>();
+        }
+
+        var items = await _context.InventoryItems.ToListAsync();
+
+        _cache.Set(cacheKey, items, TimeSpan.FromSeconds(30));
+
+        return items;
     }
 
     // POST: api/inventory
