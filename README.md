@@ -4,16 +4,6 @@ This is the peer-graded assignment for "Deployment and DevOps," the 11th course 
 
 A project template for creating a RESTful Web API using ASP.NET Core controllers or minimal APIs, with optional support for OpenAPI and authentication.
 
-## JWT configuration
-
-The JWT signing key is never stored in tracked configuration. For local development, configure user secrets:
-
-```powershell
-dotnet user-secrets set "Jwt:Key" "<a-long-random-signing-key>" --project .\LogiTrack\LogiTrack.csproj
-```
-
-For production, set the `Jwt__Key` environment variable through the deployment secret store. Do not put the production key in `appsettings.json`, `appsettings.Development.json`, or source control.
-
 ## Introduction
 
 You're developing the Order Management System for LogiTrack, a logistics software platform. This system will manage inventory items and customer orders across multiple fulfillment centers.
