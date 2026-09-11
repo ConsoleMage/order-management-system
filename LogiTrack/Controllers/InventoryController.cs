@@ -2,6 +2,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.Extensions.Caching.Memory;
+using System.Diagnostics;
 
 namespace LogiTrack.Controllers;
 
@@ -10,29 +11,49 @@ namespace LogiTrack.Controllers;
 [Authorize]
 public class InventoryController : ControllerBase
 {
+    private const string CacheKey = "inventory-items";
     private readonly LogiTrackContext _context;
     private readonly IMemoryCache _cache;
+    private readonly ILogger<InventoryController> _logger;
 
-    public InventoryController(LogiTrackContext context, IMemoryCache cache)
+    public InventoryController(
+        LogiTrackContext context,
+        IMemoryCache cache,
+        ILogger<InventoryController> logger)
     {
         _context = context;
         _cache = cache;
+        _logger = logger;
     }
 
     // GET: api/inventory
     [HttpGet]
     public async Task<ActionResult<IEnumerable<InventoryItem>>> GetInventoryItems()
     {
-        const string cacheKey = "inventory-items";
+        var stopwatch = Stopwatch.StartNew();
 
-        if (_cache.TryGetValue(cacheKey, out List<InventoryItem>? cachedItems))
+        if (_cache.TryGetValue(CacheKey, out List<InventoryItem>? cachedItems))
         {
+            stopwatch.Stop();
+            Response.Headers["X-Cache"] = "HIT";
+            Response.Headers["X-Cache-Elapsed-Milliseconds"] = stopwatch.Elapsed.TotalMilliseconds.ToString("F3");
+            _logger.LogInformation(
+                "Inventory cache hit returned {ItemCount} items in {ElapsedMilliseconds:F3} ms",
+                cachedItems?.Count ?? 0,
+                stopwatch.Elapsed.TotalMilliseconds);
             return cachedItems ?? new List<InventoryItem>();
         }
 
         var items = await _context.InventoryItems.ToListAsync();
 
-        _cache.Set(cacheKey, items, TimeSpan.FromSeconds(30));
+        _cache.Set(CacheKey, items, TimeSpan.FromSeconds(30));
+        stopwatch.Stop();
+        Response.Headers["X-Cache"] = "MISS";
+        Response.Headers["X-Cache-Elapsed-Milliseconds"] = stopwatch.Elapsed.TotalMilliseconds.ToString("F3");
+        _logger.LogInformation(
+            "Inventory cache miss loaded {ItemCount} items in {ElapsedMilliseconds:F3} ms",
+            items.Count,
+            stopwatch.Elapsed.TotalMilliseconds);
 
         return items;
     }
@@ -43,6 +64,7 @@ public class InventoryController : ControllerBase
     {
         _context.InventoryItems.Add(item);
         await _context.SaveChangesAsync();
+        _cache.Remove(CacheKey);
 
         return CreatedAtAction(nameof(GetInventoryItems), new { id = item.ItemId }, item);
     }
@@ -60,6 +82,7 @@ public class InventoryController : ControllerBase
 
         _context.InventoryItems.Remove(item);
         await _context.SaveChangesAsync();
+        _cache.Remove(CacheKey);
 
         return NoContent();
     }
